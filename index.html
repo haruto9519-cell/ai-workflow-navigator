@@ -440,6 +440,7 @@ ${rec.tool}
 削減可能時間：約${fmt(saved)}時間／月
 ※上記は仮定による試算で、実際の効果を保証するものではありません。`;
 
+      document.getElementById("planText").textContent = currentPlan;
       document.getElementById("copyStatus").textContent = "";
       document.getElementById("copyButton").textContent = "プランをコピーする";
       empty.style.display = "none";
