@@ -171,6 +171,9 @@
       border-radius: 10px;
       padding: 13px;
     }
+    .feedback { margin-top: 22px; }
+    .feedback textarea { width: 100%; min-height: 92px; resize: vertical; border: 1px solid #d6e0e8; border-radius: 10px; padding: 12px 13px; font: inherit; font-size: 13px; }
+    .feedback .field { margin-bottom: 14px; }
     .notice {
       background: #fff8e8; border: 1px solid #f1dfb2; color: #6c5625;
       border-radius: 12px; padding: 13px 15px; font-size: 12px; margin-top: 22px;
@@ -293,6 +296,36 @@
         </div>
       </section>
     </div>
+
+    <section class="panel feedback">
+      <h2>改善のためのフィードバック</h2>
+      <p class="sub">使ってみた感想をまとめられます。回答は自動送信されません。</p>
+      <div class="field">
+        <label for="feedbackRating">この改善プランは役に立ちそうですか？</label>
+        <select id="feedbackRating">
+          <option value="役に立ちそう">役に立ちそう</option>
+          <option value="少し役に立ちそう">少し役に立ちそう</option>
+          <option value="あまり役に立たない">あまり役に立たない</option>
+          <option value="判断できない">判断できない</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="feedbackFeature">特に役立った・ほしい機能</label>
+        <select id="feedbackFeature">
+          <option value="業務改善の手順">業務改善の手順</option>
+          <option value="作業時間の試算">作業時間の試算</option>
+          <option value="コピーできる実行プラン">コピーできる実行プラン</option>
+          <option value="業種別の具体例">業種別の具体例</option>
+          <option value="もっと具体的な自動化方法">もっと具体的な自動化方法</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="feedbackComment">気づいたこと・改善してほしい点（任意）</label>
+        <textarea id="feedbackComment" maxlength="500" placeholder="例：塾の保護者からの問い合わせに使える回答例がほしい"></textarea>
+      </div>
+      <button type="button" class="secondary" id="feedbackCopy">感想をコピーする</button>
+      <p class="hint" id="feedbackStatus" role="status">コピーした感想は、サイト運営者など、送り先に自分で共有してください。個人情報は書かないでください。</p>
+    </section>
 
     <div class="notice">
       <strong>ご利用にあたって</strong><br>
@@ -455,6 +488,32 @@ ${rec.tool}
         }[char];
       });
     }
+
+    document.getElementById("feedbackCopy").addEventListener("click", async function() {
+      const rating = document.getElementById("feedbackRating").value;
+      const feature = document.getElementById("feedbackFeature").value;
+      const comment = document.getElementById("feedbackComment").value.trim();
+      const feedback = "【AI業務改善ナビへの感想】\\n役立ち度：" + rating + "\\n役立った・ほしい機能：" + feature + "\\nコメント：" + (comment || "なし");
+      const status = document.getElementById("feedbackStatus");
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(feedback);
+        } else {
+          const area = document.createElement("textarea");
+          area.value = feedback;
+          area.style.position = "fixed";
+          area.style.opacity = "0";
+          document.body.appendChild(area);
+          area.select();
+          const copied = document.execCommand("copy");
+          area.remove();
+          if (!copied) throw new Error("copy failed");
+        }
+        status.textContent = "感想をコピーしました。送り先に自分で共有してください。自動送信はされていません。";
+      } catch (error) {
+        status.textContent = feedback;
+      }
+    });
 
     document.getElementById("copyButton").addEventListener("click", async function() {
       if (!currentPlan) return;
